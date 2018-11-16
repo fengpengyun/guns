@@ -107,4 +107,6 @@ $(function () {
     table.setExpandAll(true);
     table.init();
     Dept.table = table;
+
+    moqui.notifyValidationError("想我家小宝贝了 "+ moqui.format ("2018-2-02 12:02:10", "", "timestamp"));
 });
