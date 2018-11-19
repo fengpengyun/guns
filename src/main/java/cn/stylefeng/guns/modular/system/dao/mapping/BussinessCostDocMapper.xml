@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.BussinessCostDocMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.BussinessCostDoc">
+        <id column="id" property="id" />
+        <result column="num" property="num" />
+        <result column="cost" property="cost" />
+        <result column="costtype" property="costtype" />
+        <result column="simplename" property="simplename" />
+        <result column="fullname" property="fullname" />
+        <result column="tips" property="tips" />
+        <result column="version" property="version" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <select id="list" resultType="map">
+        select * from bussiness_cost_doc
+        <if test="condition != null and condition != ''">
+            where simplename like CONCAT('%',#{condition},'%') or fullname like CONCAT('%',#{condition},'%')
+        </if>
+        order by num ASC
+    </select>
+
+</mapper>
