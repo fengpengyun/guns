@@ -1184,12 +1184,103 @@ Vue.component('subscreens-active', {
     mounted: function() { this.$root.addSubscreen(this); }
 });
 
+//测试 start
+Vue.component('todo-item', {
+    // todo-item 组件现在接受一个
+    // "prop"，类似于一个自定义特性。
+    // 这个 prop 名为 todo。
+    props: ['todo'],
+    template: '<li>{{ todo.text }}</li>'
+});
+
+Vue.component('todo-item', {
+    template: '\
+    <li>\
+      {{ title }}\
+      <button v-on:click="$emit(\'remove\')">Remove</button>\
+    </li>\
+  ',
+    props: ['title']
+});
+
+var app7 = new Vue({
+    el: '#app-7',
+    data: {
+        groceryList: [
+            { id: 0, text: '蔬菜' },
+            { id: 1, text: '奶酪' },
+            { id: 2, text: '随便其它什么人吃的东西' }
+        ],
+        numbers: [ 1, 2, 3, 4, 5 ]
+    },
+    computed: {
+        evenNumbers: function () {
+            return this.numbers.filter(function (number) {
+                return number % 2 === 0
+            })
+        }
+    }
+});
+
 new Vue({
     el: '#apps-root1',
     data: {
-        message: '<h1>菜鸟教程</h1>'
+        message: '<h1>菜鸟教程</h1>',
+        isExist:1,
+        checked:[],
+        checkedNames: [],
+        picked: '',
+        age:''
+    },
+    watch:{
+        isExist:function () {
+            console.log("isExist="+this.isExist);
+            app7.groceryList=[
+                { id: 2, text: '蔬菜' },
+                { id: 1, text: '奶酪' },
+                { id: 0, text: '随便其它什么人吃的东西' }
+            ]
+        }
+    },
+    methods:{
+        enterFun:function () {
+            moqui.notifyMessages ("还他妈的不发工资。傻逼公司", 'info', "")
+        }
     }
 });
+
+new Vue({
+    el: '#todo-list-example',
+    data: {
+        newTodoText: '',
+        todos: [
+            {
+                id: 1,
+                title: 'Do the dishes',
+            },
+            {
+                id: 2,
+                title: 'Take out the trash',
+            },
+            {
+                id: 3,
+                title: 'Mow the lawn'
+            }
+        ],
+        nextTodoId: 4
+    },
+    methods: {
+        addNewTodo: function () {
+            this.todos.push({
+                id: this.nextTodoId++,
+                title: this.newTodoText
+            })
+            this.newTodoText = ''
+        }
+    }
+})
+
+//测试 end
 
 moqui.webrootVue = new Vue({
     el: '#apps-root',

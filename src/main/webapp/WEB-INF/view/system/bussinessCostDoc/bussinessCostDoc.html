@@ -1,4 +1,3 @@
-@layout("/common/_container.html"){
 <div class="row">
     <div class="col-sm-12">
         <div class="ibox float-e-margins">
@@ -18,21 +17,106 @@
                         </div>
                         <div class="hidden-xs" id="BussinessCostDocTableToolbar" role="group">
                             @if(shiro.hasPermission("/bussinessCostDoc/add")){
-                                <#button name="添加" icon="fa-plus" clickFun="BussinessCostDoc.openAddBussinessCostDoc()"/>
+                            <#button name="添加" icon="fa-plus" clickFun="BussinessCostDoc.openAddBussinessCostDoc()"/>
                             @}
                             @if(shiro.hasPermission("/bussinessCostDoc/update")){
-                                <#button name="修改" icon="fa-edit" clickFun="BussinessCostDoc.openBussinessCostDocDetail()" space="true"/>
+                            <#button name="修改" icon="fa-edit" clickFun="BussinessCostDoc.openBussinessCostDocDetail()" space="true"/>
                             @}
                             @if(shiro.hasPermission("/bussinessCostDoc/delete")){
-                                <#button name="删除" icon="fa-remove" clickFun="BussinessCostDoc.delete()" space="true"/>
+                            <#button name="删除" icon="fa-remove" clickFun="BussinessCostDoc.delete()" space="true"/>
                             @}
                         </div>
                         <#table id="BussinessCostDocTable"/>
+                        <div id="apps-root">
+                            <my-component></my-component>
+                        </div>
+                        <div id="apps-root1">
+                            <p>{{ message }}</p>
+
+                            <span v-if="isExist==1">isExist</span>
+                            <span v-else>else</span>
+                            <input v-model="isExist" v-on:click.left="enterFun" value="11"/>
+                            <textarea v-model="isExist" >1414141111</textarea>
+                            <span>{{isExist}}</span>
+
+                            <input type="checkbox" id="checkbox" v-model="checked">
+                            <label for="checkbox">{{ checked }}</label>
+
+                            <div id='example-3'>
+                                <input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
+                                <label for="jack">Jack</label>
+                                <input type="checkbox" id="john" value="John" v-model="checkedNames">
+                                <label for="john">John</label>
+                                <input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
+                                <label for="mike">Mike</label>
+                                <br>
+                                <span>Checked names: {{ checkedNames }}</span>
+                            </div>
+
+                            <input v-model.trim="age">
+
+                            <div id="example-4">
+                                <input type="radio" id="one" value="One" v-model="picked">
+                                <label for="one">One</label>
+                                <br>
+                                <input type="radio" id="two" value="Two" v-model="picked">
+                                <label for="two">Two</label>
+                                <br>
+                                <span>Picked: {{ picked }}</span>
+                            </div>
+
+                            <template v-if="isExist==1">
+                                <label>Username</label>
+                                <input placeholder="Enter your username" key="username-input">
+                            </template>
+                            <template v-else>
+                                <label>Email</label>
+                                <input placeholder="Enter your email address" key="email-input">
+                            </template>
+
+                            <h1 v-show="isExist==1">Hello!</h1>
+
+                        </div>
+                        <div id="app-7">
+                            <ol>
+                                <todo-item
+                                        v-for="item in groceryList"
+                                        v-bind:todo="item"
+                                        v-bind:key="item.id">
+                                </todo-item>
+                            </ol>
+
+                            <li v-for="n in evenNumbers">{{ n }}</li>
+
+                        </div>
+
+                        <div id="todo-list-example">
+                            <form v-on:submit.prevent="addNewTodo">
+                                <label for="new-todo">Add a todo</label>
+                                <input
+                                        v-model="newTodoText"
+                                        id="new-todo"
+                                        placeholder="E.g. Feed the cat"
+                                >
+                                <button v-on:click.prevent="addNewTodo">Add</button>
+                            </form>
+                            <ul>
+                                <li
+                                        is="todo-item"
+                                        v-for="(todo, index) in todos"
+                                        v-bind:key="todo.id"
+                                        v-bind:title="todo.title"
+                                        v-on:remove="todos.splice(index, 1)"
+                                ></li>
+                            </ul>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+@layout("/common/_container.html"){
 <script src="${ctxPath}/static/modular/system/bussinessCostDoc/bussinessCostDoc.js"></script>
 @}
