@@ -1203,6 +1203,28 @@ Vue.component('todo-item', {
     props: ['title']
 });
 
+Vue.component('blog-post', {
+    props: ['post'],
+    template: '<div class="blog-pos"> <h3>{{ post.title }}</h3>\
+             <button v-on:click="$emit(\'enlarg_text\',\'0.2\',0.3)"> Enlarge text  </button>\
+              <div v-html="post.conten"></div>\
+   </div>'
+});
+
+Vue.component('custom-input', {
+    data:function () {
+        return{
+            value:0
+        }
+    },
+    // props: ['value'],
+    template:'\
+    <input\
+      v-bind:value="value"\
+      v-on:input="$emit(\'input\', $event.target.value)"\
+    >'
+});
+
 var app7 = new Vue({
     el: '#app-7',
     data: {
@@ -1230,7 +1252,8 @@ new Vue({
         checked:[],
         checkedNames: [],
         picked: '',
-        age:''
+        age:'',
+        searchText:0
     },
     watch:{
         isExist:function () {
@@ -1240,6 +1263,9 @@ new Vue({
                 { id: 1, text: '奶酪' },
                 { id: 0, text: '随便其它什么人吃的东西' }
             ]
+        },
+        searchText:function () {
+            alert("searchText="+this.searchText);
         }
     },
     methods:{
@@ -1248,6 +1274,24 @@ new Vue({
         }
     }
 });
+
+new Vue({
+    el: '#blog-posts-events-demo',
+    data: {
+        posts: [
+            { id: 1, title: 'My journey with Vue' },
+            { id: 2, title: 'Blogging with Vue' },
+            { id: 3, title: 'Why Vue is so fun' }
+        ],
+        postFontSize: 1
+    },
+    methods: {
+        onEnlargeText: function (enlargeAmount,enlargeAmount1) {
+            alert(enlargeAmount+"///"+enlargeAmount1);
+            this.postFontSize += enlargeAmount
+        }
+    }
+})
 
 new Vue({
     el: '#todo-list-example',
