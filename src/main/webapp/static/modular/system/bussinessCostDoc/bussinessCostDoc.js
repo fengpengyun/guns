@@ -95,9 +95,22 @@ BussinessCostDoc.search = function () {
     BussinessCostDoc.table.refresh({query: queryData});
 };
 
+//局部注册组件
+var component= {
+    template: '<div>A custom component from div-component!</div>'
+};
+
 $(function () {
     var defaultColunms = BussinessCostDoc.initColumn();
     var table = new BSTable(BussinessCostDoc.id, "/bussinessCostDoc/list", defaultColunms);
     table.setPaginationType("client");
     BussinessCostDoc.table = table.init();
+
+    //创建vue实例
+    var app7 = new Vue({
+        el: '#apps-root2',
+        components:{
+            "div-component":component
+        }
+    })
 });
