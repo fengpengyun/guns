@@ -1123,10 +1123,6 @@ Vue.component('text-autocomplete', {
 });
 
 /* ========== webrootVue - root Vue component with router ========== */
-// 注册
-Vue.component('my-component', {
-    template: '<div>A custom component!</div>'
-});
 
 Vue.component('subscreens-tabs', {
     data: function() { return { pathIndex:-1 }},
@@ -1185,6 +1181,42 @@ Vue.component('subscreens-active', {
 });
 
 //测试 start
+// 注册
+Vue.component('my-component', {
+    // props: {
+    //     // 基础的类型检查 (`null` 匹配任何类型)
+    //     propA: Number,
+    //     // 多个可能的类型
+    //     propB: [String, Number],
+    //     // 必填的字符串
+    //     propC: {
+    //         type: String,
+    //         required: true
+    //     },
+    //     // 带有默认值的数字
+    //     propD: {
+    //         type: Number,
+    //         default: 100
+    //     },
+    //     // 带有默认值的对象
+    //     propE: {
+    //         type: Object,
+    //         // 对象或数组默认值必须从一个工厂函数获取
+    //         default: function () {
+    //             return { message: 'hello' }
+    //         }
+    //     },
+    //     // 自定义验证函数
+    //     propF: {
+    //         validator: function (value) {
+    //             // 这个值必须匹配下列字符串中的一个
+    //             return ['success', 'warning', 'danger'].indexOf(value) !== -1
+    //         }
+    //     }
+    // },
+    template: '<div>A custom component!</div>'
+});
+
 Vue.component('todo-item', {
     // todo-item 组件现在接受一个
     // "prop"，类似于一个自定义特性。
@@ -1225,6 +1257,23 @@ Vue.component('custom-input', {
       v-bind:value="value"\
       v-on:input="$emit(\'input\', $event.target.value)"\
     >'
+});
+
+Vue.component('single-input', {
+    data:function () {
+        return{
+            local_value:this.value
+        }
+    },
+    props: ['value'],
+    template:'\
+    <input v-bind:value="local_value"\
+    />',
+    watch:{
+        local_value:function () {
+            alert("local_value="+this.local_value);
+        }
+    }
 });
 
 var app7 = new Vue({
