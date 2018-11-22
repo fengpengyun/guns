@@ -1243,7 +1243,26 @@ Vue.component('blog-post', {
    </div>'
 });
 
-
+Vue.component('base-checkbox', {
+    model: {
+        prop: 'checked',
+        event: 'change'
+    },
+    props: {
+        checked: Boolean
+    },
+    template: '\
+     <input\
+      type="checkbox"\
+      v-bind:checked="checked"\
+      v-on:change="$emit(\'change\', $event.target.checked)"\
+    >',
+    watch:{
+        checked:function () {
+            alert("checked="+this.checked);
+        }
+    }
+});
 
 Vue.component('custom-input', {
     data:function () {
@@ -1274,6 +1293,36 @@ Vue.component('single-input', {
             alert("local_value="+this.local_value);
         }
     }
+});
+
+Vue.component('base-layout', {
+    data:function () {
+        return{
+
+        }
+    },
+    props: ['value'],
+    template:'\
+    <div class="container">\
+    <header><slot name="header"></slot></header>\
+    <main><slot></slot></main>\
+    <footer><slot name="footer"></slot></footer>\
+    </div>'
+});
+
+Vue.component('todo-list', {
+    template:'\
+    <ul>\
+     <li\
+      v-for="todo in todos"\
+      v-bind:key="todo.id"\
+      v-bind:id="todo.id"\
+      >\
+       <solt v-bind:todo="todo">\
+        {{todo.text}}\
+        </solt>\
+       </li>\
+      </ul>'
 });
 
 var app7 = new Vue({
@@ -1317,11 +1366,27 @@ new Vue({
         },
         searchText:function () {
             alert("searchText="+this.searchText);
+        },
+        existorno:function () {
+            alert("get existorno="+this.existorno)
         }
     },
     methods:{
         enterFun:function () {
             moqui.notifyMessages ("还他妈的不发工资。傻逼公司", 'info', "")
+        },
+        onFocus:function (even) {
+            console.log(even);
+        }
+    },
+    computed:{
+        existorno:{
+            get:function () {
+                return this.isExist==1?true:false
+            },
+            set:function () {
+                this.isExist=this.existorno
+            }
         }
     }
 });
@@ -1352,17 +1417,24 @@ new Vue({
             {
                 id: 1,
                 title: 'Do the dishes',
+                text: 'Do the dishes',
+                isComplete: true
             },
             {
                 id: 2,
                 title: 'Take out the trash',
+                text: 'Take out the trash',
+                isComplete: false
             },
             {
                 id: 3,
-                title: 'Mow the lawn'
+                title: 'Mow the lawn',
+                text: 'Mow the lawn',
+                isComplete: false
             }
         ],
-        nextTodoId: 4
+        nextTodoId: 4,
+        slotProps:{}
     },
     methods: {
         addNewTodo: function () {

@@ -42,7 +42,7 @@
                             <textarea v-model="isExist" >1414141111</textarea>
                             <span>{{isExist}}</span>
 
-                            <single-input v-bind:value="isExist" data-date-picker="activated"></single-input>
+                            <single-input v-bind:value="isExist" v-on:focus.native="onFocus" data-date-picker="activated"></single-input>
 
                             <input type="checkbox" id="checkbox" v-model="checked">
                             <label for="checkbox">{{ checked }}</label>
@@ -83,6 +83,7 @@
 
                             <custom-input v-model="searchText"></custom-input>
 
+                            <base-checkbox v-model="existorno"></base-checkbox>
 
                         </div>
 
@@ -129,6 +130,30 @@
                                         v-on:remove="todos.splice(index, 1)"
                                 ></li>
                             </ul>
+
+                            <base-layout>
+                                <template slot="header">
+                                    <h1>Here might be a page title</h1>
+                                </template>
+
+                                <p>A paragraph for the main content.</p>
+                                <p>And another one.</p>
+
+                                <template slot="footer">
+                                    <p>Here's some contact info</p>
+                                </template>
+                            </base-layout>
+
+                            <todo-list v-bind:todos="todos">
+                                <!-- 将 `slotProps` 定义为插槽作用域的名字 -->
+                                <template slot-scope="slotProps">
+                                    <!-- 为待办项自定义一个模板，-->
+                                    <!-- 通过 `slotProps` 定制每个待办项。-->
+                                    <span v-if="slotProps.todo.isComplete">✓</span>
+                                    {{ slotProps.todo.text }}
+                                </template>
+                            </todo-list>
+
                         </div>
 
                     </div>
