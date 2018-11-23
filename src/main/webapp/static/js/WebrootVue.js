@@ -1445,8 +1445,47 @@ new Vue({
             this.newTodoText = ''
         }
     }
-})
+});
 
+new Vue({
+    el: '#staggered-list-demo',
+    data: {
+        query: '',
+        list: [
+            { msg: 'Bruce Lee' },
+            { msg: 'Jackie Chan' },
+            { msg: 'Chuck Norris' },
+            { msg: 'Jet Li' },
+            { msg: 'Kung Fury' }
+        ]
+    },
+    computed: {
+        computedList: function () {
+            var vm = this
+            return this.list.filter(function (item) {
+                return item.msg.toLowerCase().indexOf(vm.query.toLowerCase()) !== -1
+            })
+        }
+    },
+    methods: {
+        beforeEnter: function (el) {
+            el.style.opacity = 0
+            el.style.height = 0
+        },
+        enter: function (el, done) {
+            console.log(el);
+            var delay = el.dataset.index * 150;
+            alert(delay);
+            done();
+        },
+        leave: function (el, done) {
+            console.log(el);
+            var delay = el.dataset.index * 150;
+            alert(delay);
+            done();
+        }
+    }
+})
 //测试 end
 
 moqui.webrootVue = new Vue({

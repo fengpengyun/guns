@@ -28,7 +28,12 @@
                         </div>
                         <#table id="BussinessCostDocTable"/>
                         <div id="apps-root">
-                            <my-component></my-component>
+                            <my-component inline-template>
+                                <div>
+                                    <p>These are compiled as the component's own template.</p>
+                                    <p>Not parent's transclusion content.</p>
+                                </div>
+                            </my-component>
                         </div>
                         <div id="apps-root2">
                             <div-component></div-component>
@@ -153,7 +158,24 @@
                                     {{ slotProps.todo.text }}
                                 </template>
                             </todo-list>
+                        </div>
 
+                        <div id="staggered-list-demo">
+                            <input v-model="query">
+                            <transition-group
+                                    name="staggered-fade"
+                                    tag="ul"
+                                    v-bind:css="false"
+                                    v-on:before-enter="beforeEnter"
+                                    v-on:enter="enter"
+                                    v-on:leave="leave"
+                            >
+                                <li
+                                        v-for="(item, index) in computedList"
+                                        v-bind:key="item.msg"
+                                        v-bind:data-index="index"
+                                >{{ item.msg }}</li>
+                            </transition-group>
                         </div>
 
                     </div>
@@ -163,5 +185,20 @@
     </div>
 </div>
 @layout("/common/_container.html"){
+<link href="https://cdn.jsdelivr.net/npm/animate.css" rel="stylesheet" type="text/css">
 <script src="${ctxPath}/static/modular/system/bussinessCostDoc/bussinessCostDoc.js"></script>
+<style>
+    .list-item {
+        display: inline-block;
+        margin-right: 10px;
+    }
+    .list-enter-active, .list-leave-active {
+        transition: all 1s;
+    }
+    .list-enter, .list-leave-to
+        /* .list-leave-active for below version 2.1.8 */ {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+</style>
 @}
