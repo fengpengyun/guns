@@ -148,16 +148,6 @@
                                     <p>Here's some contact info</p>
                                 </template>
                             </base-layout>
-
-                            <todo-list v-bind:todos="todos">
-                                <!-- 将 `slotProps` 定义为插槽作用域的名字 -->
-                                <template slot-scope="slotProps">
-                                    <!-- 为待办项自定义一个模板，-->
-                                    <!-- 通过 `slotProps` 定制每个待办项。-->
-                                    <span v-if="slotProps.todo.isComplete">✓</span>
-                                    {{ slotProps.todo.text }}
-                                </template>
-                            </todo-list>
                         </div>
 
                         <div id="staggered-list-demo">
@@ -176,6 +166,10 @@
                                         v-bind:data-index="index"
                                 >{{ item.msg }}</li>
                             </transition-group>
+                        </div>
+
+                        <div id="mixins">
+
                         </div>
 
                     </div>

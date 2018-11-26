@@ -1325,6 +1325,21 @@ Vue.component('todo-list', {
       </ul>'
 });
 
+Vue.component('anchored-heading', {
+    render: function (createElement) {
+        return createElement(
+            'h' + this.level,   // 标签名称
+            this.$slots.default // 子元素数组
+        )
+    },
+    props: {
+        level: {
+            type: Number,
+            required: true
+        }
+    }
+});
+
 var app7 = new Vue({
     el: '#app-7',
     data: {
@@ -1485,7 +1500,55 @@ new Vue({
             done();
         }
     }
-})
+});
+You can also change <widget-vue> HTML attributes and changes will be instantly reflected
+var mixin = {
+    render: function (h) {
+        return '<div id="foo">bar</div>'
+    },
+    methods: {
+        foo: function () {
+            console.log('foo')
+        },
+        conflicting: function () {
+            console.log('from mixin')
+        }
+    },
+    directives: {
+        focus: {
+            // 指令的定义
+            inserted: function (el) {
+                el.focus()
+            }
+        }
+    }
+};
+
+var vm = new Vue({
+    el:"#mixins",
+    mixins: [mixin],
+    data: {
+        value:23,
+        message: 'red'
+    },
+    methods: {
+        bar: function () {
+            const log=11;
+            let array=['a','bc','def','ghij'];
+            console.log(array)
+        },
+        conflicting: function () {
+            console.log('from self')
+        },
+        changeValue:function (value) {
+            this.value=value;
+        }
+    },
+    created:function () {
+        this.bar();
+    }
+});
+
 //测试 end
 
 moqui.webrootVue = new Vue({
