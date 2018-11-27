@@ -1,3 +1,58 @@
+<script type="module">
+    export default {
+        computed: {
+            username () {
+                // 我们很快就会看到 `params` 是什么
+                return this.$route.params.username
+            }
+        },
+        methods: {
+            goBack () {
+                window.history.length > 1
+                    ? this.$router.go(-1)
+                    : this.$router.push('/')
+            }
+        }
+    }
+
+    // 0. 如果使用模块化机制编程，导入Vue和VueRouter，要调用 Vue.use(VueRouter)
+
+    // 1. 定义 (路由) 组件。
+    // 可以从其他文件 import 进来
+    const Foo = { template: '<div>foo</div>' };
+    const Bar = { template: '<div>bar</div>' };
+    const Feng = { template: '<input></input>' };
+    const SingleInput=Vue.component('single-input');
+
+    // 2. 定义路由
+    // 每个路由应该映射一个组件。 其中"component" 可以是
+    // 通过 Vue.extend() 创建的组件构造器，
+    // 或者，只是一个组件配置对象。
+    // 我们晚点再讨论嵌套路由。
+    const routes = [
+        { path: '/foo', component: Foo },
+        { path: '/bar', component: Bar },
+        { path: '/feng', component: Feng },
+        { path: '/singleInput', component: SingleInput },
+    ]
+
+    // 3. 创建 router 实例，然后传 `routes` 配置
+    // 你还可以传别的配置参数, 不过先这么简单着吧。
+    const router = new VueRouter({
+        routes // (缩写) 相当于 routes: routes
+    })
+
+    // 4. 创建和挂载根实例。
+    // 记得要通过 router 配置参数注入路由，
+    // 从而让整个应用都有路由功能
+    const app = new Vue({
+        router
+    }).$mount('#app')
+
+    // 现在，应用已经启动了！
+
+
+</script>
 <div class="row">
     <div class="col-sm-12">
         <div class="ibox float-e-margins">
@@ -27,150 +82,31 @@
                             @}
                         </div>
                         <#table id="BussinessCostDocTable"/>
-                        <div id="apps-root">
-                            <my-component inline-template>
-                                <div>
-                                    <p>These are compiled as the component's own template.</p>
-                                    <p>Not parent's transclusion content.</p>
-                                </div>
-                            </my-component>
-                        </div>
-                        <div id="apps-root2">
-                            <div-component></div-component>
-                        </div>
-                        <div id="apps-root1">
-                            <p>{{ message }}</p>
-
-                            <span v-if="isExist==1">isExist</span>
-                            <span v-else>else</span>
-                            <input v-model="isExist" v-on:click.left="enterFun" value="11"/>
-                            <textarea v-model="isExist" >1414141111</textarea>
-                            <span>{{isExist}}</span>
-
-                            <single-input v-bind:value="isExist" v-on:focus.native="onFocus" data-date-picker="activated"></single-input>
-
-                            <input type="checkbox" id="checkbox" v-model="checked">
-                            <label for="checkbox">{{ checked }}</label>
-
-                            <div id='example-3'>
-                                <input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
-                                <label for="jack">Jack</label>
-                                <input type="checkbox" id="john" value="John" v-model="checkedNames">
-                                <label for="john">John</label>
-                                <input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
-                                <label for="mike">Mike</label>
-                                <br>
-                                <span>Checked names: {{ checkedNames }}</span>
-                            </div>
-
-                            <input v-model.trim="age">
-
-                            <div id="example-4">
-                                <input type="radio" id="one" value="One" v-model="picked">
-                                <label for="one">One</label>
-                                <br>
-                                <input type="radio" id="two" value="Two" v-model="picked">
-                                <label for="two">Two</label>
-                                <br>
-                                <span>Picked: {{ picked }}</span>
-                            </div>
-
-                            <template v-if="isExist==1">
-                                <label>Username</label>
-                                <input placeholder="Enter your username" key="username-input">
-                            </template>
-                            <template v-else>
-                                <label>Email</label>
-                                <input placeholder="Enter your email address" key="email-input">
-                            </template>
-
-                            <h1 v-show="isExist==1">Hello!</h1>
-
-                            <custom-input v-model="searchText"></custom-input>
-
-                            <base-checkbox v-model="existorno"></base-checkbox>
+                        <!--使用vue-router开发单页面应用 start-->
+                        <div id="app">
+                            <h1>Hello App!</h1>
+                            <p>
+                                <!-- 使用 router-link 组件来导航. -->
+                                <!-- 通过传入 `to` 属性指定链接. -->
+                                <!-- <router-link> 默认会被渲染成一个 `<a>` 标签 -->
+                                <router-link to="/foo">Go to Foo</router-link>
+                                <router-link to="/bar">Go to Bar</router-link>
+                                <router-link to="/feng">Go to Feng</router-link>
+                                <router-link to="/singleInput">Go to SingleInput</router-link>
+                            </p>
+                            <!-- 路由出口 -->
+                            <!-- 路由匹配到的组件将渲染在这里 -->
+                            <transition>
+                                <keep-alive>
+                                    <router-view name="Foo"></router-view>
+                                </keep-alive>
+                            </transition>
 
                         </div>
+                        <!--使用vue-router开发单页面应用 end-->
 
-                        <div id="blog-posts-events-demo">
-                            <div :style="{ fontSize: postFontSize + 'em' }">
-                                <blog-post
-                                        v-for="post in posts"
-                                        v-bind:key="post.id"
-                                        v-bind:post="post"
-                                        v-on:enlarg_text="onEnlargeText"
-                                ></blog-post>
-                            </div>
-                        </div>
-
-                        <div id="app-7">
-                            <ol>
-                                <todo-item
-                                        v-for="item in groceryList"
-                                        v-bind:todo="item"
-                                        v-bind:key="item.id">
-                                </todo-item>
-                            </ol>
-
-                            <li v-for="n in evenNumbers">{{ n }}</li>
-
-                        </div>
-
-                        <div id="todo-list-example">
-                            <form v-on:submit.prevent="addNewTodo">
-                                <label for="new-todo">Add a todo</label>
-                                <input
-                                        v-model="newTodoText"
-                                        id="new-todo"
-                                        placeholder="E.g. Feed the cat"
-                                >
-                                <button v-on:click.prevent="addNewTodo">Add</button>
-                            </form>
-                            <ul>
-                                <li
-                                        is="todo-item"
-                                        v-for="(todo, index) in todos"
-                                        v-bind:key="todo.id"
-                                        v-bind:title="todo.title"
-                                        v-on:remove="todos.splice(index, 1)"
-                                ></li>
-                            </ul>
-
-                            <base-layout>
-                                <template slot="header">
-                                    <h1>Here might be a page title</h1>
-                                </template>
-
-                                <p>A paragraph for the main content.</p>
-                                <p>And another one.</p>
-
-                                <template slot="footer">
-                                    <p>Here's some contact info</p>
-                                </template>
-                            </base-layout>
-                        </div>
-
-                        <div id="staggered-list-demo">
-                            <input v-model="query">
-                            <transition-group
-                                    name="staggered-fade"
-                                    tag="ul"
-                                    v-bind:css="false"
-                                    v-on:before-enter="beforeEnter"
-                                    v-on:enter="enter"
-                                    v-on:leave="leave"
-                            >
-                                <li
-                                        v-for="(item, index) in computedList"
-                                        v-bind:key="item.msg"
-                                        v-bind:data-index="index"
-                                >{{ item.msg }}</li>
-                            </transition-group>
-                        </div>
-
-                        <div id="mixins">
-
-                        </div>
+                        <!--使用vue-server-renderer开发服务端页面应用 start-->
+                        <!--使用vue-server-renderer开发服务端页面应用 end-->
 
                     </div>
                 </div>
@@ -179,20 +115,5 @@
     </div>
 </div>
 @layout("/common/_container.html"){
-<link href="https://cdn.jsdelivr.net/npm/animate.css" rel="stylesheet" type="text/css">
 <script src="${ctxPath}/static/modular/system/bussinessCostDoc/bussinessCostDoc.js"></script>
-<style>
-    .list-item {
-        display: inline-block;
-        margin-right: 10px;
-    }
-    .list-enter-active, .list-leave-active {
-        transition: all 1s;
-    }
-    .list-enter, .list-leave-to
-        /* .list-leave-active for below version 2.1.8 */ {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-</style>
 @}
