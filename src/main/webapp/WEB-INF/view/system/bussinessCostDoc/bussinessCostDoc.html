@@ -1,28 +1,32 @@
 <script type="module">
-    export default {
-        computed: {
-            username () {
-                // 我们很快就会看到 `params` 是什么
-                return this.$route.params.username
-            }
-        },
-        methods: {
-            goBack () {
-                window.history.length > 1
-                    ? this.$router.go(-1)
-                    : this.$router.push('/')
-            }
-        }
-    }
 
     // 0. 如果使用模块化机制编程，导入Vue和VueRouter，要调用 Vue.use(VueRouter)
 
     // 1. 定义 (路由) 组件。
     // 可以从其他文件 import 进来
-    const Foo = { template: '<div>foo</div>' };
-    const Bar = { template: '<div>bar</div>' };
-    const Feng = { template: '<input></input>' };
+    const Foo = {
+        template:
+        `
+        <div class="user">
+        <h2>User {{ $route.params.id }}</h2>
+        <router-view></router-view>
+        </div>
+        `
+    };
+    const Bar = {
+        props:{query:String},
+        template: '<div>{{query}}</div>' ,
+        watch:{
+            query:function () {
+                alert(this.query);
+            }
+        }
+    };
+    const Feng = {
+        template: '<span>Feng</span>'
+    };
     const SingleInput=Vue.component('single-input');
+    const UserSettings=Vue.component('user-settings');
 
     // 2. 定义路由
     // 每个路由应该映射一个组件。 其中"component" 可以是
@@ -30,23 +34,75 @@
     // 或者，只是一个组件配置对象。
     // 我们晚点再讨论嵌套路由。
     const routes = [
-        { path: '/foo', component: Foo },
-        { path: '/bar', component: Bar },
-        { path: '/feng', component: Feng },
-        { path: '/singleInput', component: SingleInput },
-    ]
+        {
+            path: '/foo/:id',
+            component: Foo,
+            children: [
+                {
+                    // 当 /user/:id/profile 匹配成功，
+                    // UserProfile 会被渲染在 User 的 <router-view> 中
+                    path: 'profile',
+                    name: 'foo1',
+                    component: SingleInput
+                },
+                {
+                    // 当 /user/:id/posts 匹配成功
+                    // UserPosts 会被渲染在 User 的 <router-view> 中
+                    path: 'posts',
+                    name: 'foo2',
+                    component: SingleInput
+                }
+            ]
+        },
+        {
+            path: '/bar/:id(\\d+)',
+            component: Bar ,
+            props: function (route) {
+                console.log(route);
+                return { query: route.query.q };
+            }
+        },
+        {
+            path: '/feng',
+            component: Feng
+    },
+        {
+            path: '/singleInput',
+            component:UserSettings ,
+            children:[
+                {
+                    path:'pro',
+                    component:SingleInput
+                },
+                {
+                    path:'pr',
+                    components:{
+                        default:Feng,
+                        helper:SingleInput
+                    }
+                }
+            ]
+        },
+    ];
 
     // 3. 创建 router 实例，然后传 `routes` 配置
     // 你还可以传别的配置参数, 不过先这么简单着吧。
     const router = new VueRouter({
-        routes // (缩写) 相当于 routes: routes
-    })
+        routes,
+        parseQuery:function () {
+
+        }
+    });
+    
+    router.beforeEach(function (to, from, next) {
+        next();
+    });
 
     // 4. 创建和挂载根实例。
     // 记得要通过 router 配置参数注入路由，
     // 从而让整个应用都有路由功能
     const app = new Vue({
-        router
+        router:router
     }).$mount('#app')
 
     // 现在，应用已经启动了！
@@ -89,17 +145,17 @@
                                 <!-- 使用 router-link 组件来导航. -->
                                 <!-- 通过传入 `to` 属性指定链接. -->
                                 <!-- <router-link> 默认会被渲染成一个 `<a>` 标签 -->
-                                <router-link to="/foo">Go to Foo</router-link>
-                                <router-link to="/bar">Go to Bar</router-link>
-                                <router-link to="/feng">Go to Feng</router-link>
-                                <router-link to="/singleInput">Go to SingleInput</router-link>
+                                <router-link v-bind:to="{name:'foo1',params:{id:1}}">Go to Foo1</router-link>
+                                <router-link v-bind:to="{name:'foo2',params:{id:2}}">Go to Foo2</router-link>
+                                <router-link to="/bar/451?q=vue">Go to Bar with params-with-regex</router-link>
+                                <router-link to="/feng?q=vue">Go to Feng</router-link>
+                                <router-link to="/singleInput/pro">Go to SingleInput pro</router-link>
+                                <router-link to="/singleInput/pr">Go to SingleInput pr</router-link>
                             </p>
                             <!-- 路由出口 -->
                             <!-- 路由匹配到的组件将渲染在这里 -->
                             <transition>
-                                <keep-alive>
-                                    <router-view name="Foo"></router-view>
-                                </keep-alive>
+                                <router-view/>
                             </transition>
 
                         </div>
