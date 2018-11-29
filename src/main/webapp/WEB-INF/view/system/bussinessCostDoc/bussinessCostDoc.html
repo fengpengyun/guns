@@ -5,21 +5,42 @@
     // 1. 定义 (路由) 组件。
     // 可以从其他文件 import 进来
     const Foo = {
+        data:{
+            oldcount:-1
+        },
         template:
         `
         <div class="user">
-        <h2>User {{ $route.params.id }}</h2>
+        <h2>User {{ $route.params.id }}----{{oldcount}}----{{count}}</h2>
         <router-view></router-view>
         </div>
-        `
+        `,
+        computed:{
+            count:function () {
+                oldcount=store.state.count;
+                return store.state.count;
+            }
+        },
+        methods:{
+            clickMethod:function () {
+                store.commit('increment');
+                console.log(store.state.count)
+            }
+        }
     };
     const Bar = {
-        props:{query:String},
-        template: '<div>{{query}}</div>' ,
-        watch:{
-            query:function () {
-                alert(this.query);
-            }
+        template: `<div>{{ count }}---{{filterCount}}</div>`,
+        computed: {
+            count:function () {
+                console.log(store);
+                console.log(this.$store);
+                return this.$store.state.count
+            },
+            ...Vuex.mapState({
+                filterCount:function () {
+                    return this.$store.getters.doneTodos.length;
+                }
+            })
         }
     };
     const Feng = {
@@ -58,13 +79,21 @@
             path: '/bar/:id(\\d+)',
             component: Bar ,
             props: function (route) {
-                console.log(route);
                 return { query: route.query.q };
             }
         },
         {
             path: '/feng',
-            component: Feng
+            component: Feng,
+            beforeEnter:function (to,from,next) {
+                alert(store.state.count);
+                if(store.state.count==0){
+                    store.state.count=store.state.count+1;
+                }else{
+                    alert(store.state.count);
+                }
+                next();
+            }
     },
         {
             path: '/singleInput',
@@ -91,11 +120,40 @@
         routes,
         parseQuery:function () {
 
-        }
+        },
+        scrollBehavior (to, from, savedPosition) {
+//           return new Promise(function (resolve,reject) {
+//               setTimeout(function () {
+//                   return resolve({x:0,y:0});
+//               },500)
+//           })
+        },
+        mode:"history"
     });
     
     router.beforeEach(function (to, from, next) {
         next();
+    });
+
+    //创建vuex（vue的状态管理工具）
+    const store = new Vuex.Store({
+        state: {
+            count: 0,
+            todos: [
+                { id: 1, text: '...', done: true },
+                { id: 2, text: '...', done: false }
+            ]
+        },
+        mutations: {
+            increment (state) {
+                state.count++
+            }
+        },
+        getters: {
+            doneTodos: state => {
+                return state.todos.filter(todo => todo.done)
+            }
+        }
     });
 
     // 4. 创建和挂载根实例。
@@ -103,11 +161,44 @@
     // 从而让整个应用都有路由功能
     const app = new Vue({
         router:router
-    }).$mount('#app')
+    }).$mount('#app');
+
+    const app1 = new Vue({
+        el: '#app1',
+        // 把 store 对象提供给 “store” 选项，这可以把 store 的实例注入所有的子组件
+        store,
+        data:{
+            localCount:1
+        },
+        components: { Bar },
+        template: `
+            <div class="app">
+            <span>{{newCount}}</span>
+            <span>{{countAlias}}</span>
+            <span>{{countPlusLocalState}}</span>
+            <bar></bar>
+            </div>
+        `,
+        computed:  {
+            localComputed:function () {
+              return {localComputed:11}
+            },
+            ...Vuex.mapState({
+                // 箭头函数可使代码更简练
+                newCount: state => state.count,
+
+                // 传字符串参数 'count' 等同于 `state => state.count`
+                countAlias: 'count',
+
+                // 为了能够使用 `this` 获取局部状态，必须使用常规函数
+                countPlusLocalState:function (state) {
+                    return state.count + this.localCount
+                }
+            })
+        }
+    });
 
     // 现在，应用已经启动了！
-
-
 </script>
 <div class="row">
     <div class="col-sm-12">
@@ -145,7 +236,7 @@
                                 <!-- 使用 router-link 组件来导航. -->
                                 <!-- 通过传入 `to` 属性指定链接. -->
                                 <!-- <router-link> 默认会被渲染成一个 `<a>` 标签 -->
-                                <router-link v-bind:to="{name:'foo1',params:{id:1}}">Go to Foo1</router-link>
+                                <router-link v-bind:to="{name:'foo1',params:{id:1}}" v-bind:key="">Go to Foo1</router-link>
                                 <router-link v-bind:to="{name:'foo2',params:{id:2}}">Go to Foo2</router-link>
                                 <router-link to="/bar/451?q=vue">Go to Bar with params-with-regex</router-link>
                                 <router-link to="/feng?q=vue">Go to Feng</router-link>
@@ -160,6 +251,11 @@
 
                         </div>
                         <!--使用vue-router开发单页面应用 end-->
+
+                        <!--使用vuex管理状态页面应用 start-->
+                        <div id="app1">
+                        </div>
+                        <!--使用vuex管理状态页面应用 end-->
 
                         <!--使用vue-server-renderer开发服务端页面应用 start-->
                         <!--使用vue-server-renderer开发服务端页面应用 end-->
