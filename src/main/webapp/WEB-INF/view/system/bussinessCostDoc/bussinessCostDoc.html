@@ -1,5 +1,5 @@
 <script type="module">
-
+    Vue.config.devtools = true;
     // 0. 如果使用模块化机制编程，导入Vue和VueRouter，要调用 Vue.use(VueRouter)
 
     // 1. 定义 (路由) 组件。
@@ -29,18 +29,26 @@
         }
     };
     const Bar = {
-        template: `<div>{{ count }}---{{filterCount}}</div>`,
+        template: `<div>{{ count }}--{{name}}--{{filterCount}}</div>`,
         computed: {
             count:function () {
-                console.log(store);
-                console.log(this.$store);
                 return this.$store.state.count
+            },
+            name:function () {
+                alert("进入 name");
+                return this.increment(10);
             },
             ...Vuex.mapState({
                 filterCount:function () {
+                    alert(this.$store.getters["a/doneTodos"].length);
                     return this.$store.getters.doneTodos.length;
                 }
             })
+        },
+        methods:{
+            ...Vuex.mapMutations([
+                'increment', // 将 `this.increment()` 映射为 `this.$store.commit('increment')`
+            ]),
         }
     };
     const Feng = {
@@ -86,7 +94,10 @@
             path: '/feng',
             component: Feng,
             beforeEnter:function (to,from,next) {
-                alert(store.state.count);
+                console.log(store.state);
+                console.log(store.getters["a/randomA"]);
+                console.log(store.state.a);
+                console.log(store.state.b);
                 if(store.state.count==0){
                     store.state.count=store.state.count+1;
                 }else{
@@ -136,6 +147,54 @@
     });
 
     //创建vuex（vue的状态管理工具）
+    const moduleA = {
+        namespaced: true,
+        state: {
+            a: 0
+        },
+        mutations: {
+            incrementA (state,n) {
+                console.log("a局部----"+state);
+                state.a+=n
+            }
+        },
+        getters: {
+            randomA:function (state,getters) {
+                console.log("a局部----"+state);
+                return Math.random();
+            }
+        },
+        actions: {
+            incrementA (context) {
+                context.commit('increment,100')
+            }
+        }
+    };
+
+    const moduleB = {
+        namespaced: true,
+        state: {
+            b: 0
+        },
+        mutations: {
+            incrementB (state,n) {
+                console.log("b局部----"+state);
+                state.b+=n
+            }
+        },
+        getters: {
+            randomB:function () {
+                console.log("b局部----"+state);
+                return Math.random();
+            }
+        },
+        actions: {
+            incrementB (context) {
+                context.commit('increment,100')
+            }
+        }
+    };
+
     const store = new Vuex.Store({
         state: {
             count: 0,
@@ -145,14 +204,24 @@
             ]
         },
         mutations: {
-            increment (state) {
-                state.count++
+            increment (state,n) {
+                alert("this.increment");
+                state.count+=n
             }
         },
         getters: {
             doneTodos: state => {
                 return state.todos.filter(todo => todo.done)
             }
+        },
+        actions: {
+            increment (context) {
+                context.commit('increment,100')
+            }
+        },
+        modules:{
+            a:moduleA,
+            b:moduleB
         }
     });
 
