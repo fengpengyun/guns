@@ -1,0 +1,115 @@
+<div id="app" class="container"><h1>购物车</h1>
+    <hr>
+    <btn-grp :buttons="buttons"></btn-grp>
+    <btn-grp :buttons="buttons_test"></btn-grp>
+    <btn-grp :buttons="buttons"></btn-grp>
+    <btn-grp :buttons="buttons_test"></btn-grp>
+    <br> <br>
+    <table class="table table-bordered table-striped table-hover">
+        <tr>
+            <th>ID</th>
+            <th>商品名称</th>
+            <th>商品价格</th>
+            <th>商品数量</th>
+            <th>商品总价</th>
+        </tr>
+        <tr v-for="(prod, index) in products">
+            <td>{{index+1}}</td>
+            <td>{{prod.name}}</td>
+            <td>{{prod.price}}</td>
+            <td>
+                <button v-on:click="changeCount(prod, -1)">-</button>
+                <input type="text" v-model="prod.count">
+                <button v-on:click="changeCount(prod, 1)">+</button>
+            </td>
+            <td>{{prod.price * prod.count}}</td>
+        </tr>
+        <tr>
+            <td colspan="4" class="text-right">总价:</td>
+            <td class="text-primary">{{getTotalMoney()}}</td>
+        </tr>
+    </table>
+</div>
+
+@layout("/common/_container.html"){
+
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            // 按钮组件测试
+            buttons_test: [
+                {title: '测试1', class: 'btn-danger'},
+                {title: '测试2'},{title: '测试3'},
+                {title: '测试4'},
+            ],
+            buttons: [{
+                title: '添加',
+                class: 'btn-primary',
+                handler: function() {
+                    alert('点击添加按钮');
+                }
+            },
+                {
+                    title: '修改',
+                    class: 'btn-default',
+                    handler: function() {
+                        alert('点击修改按钮');
+                    }
+                }, {
+                    title: '删除',
+                    class: 'btn-default',
+                    handler: function() {
+                        alert('点击删除按钮');
+                    }                 },
+            ],
+            products: [
+                {
+                    name: '小米6S',
+                    price: 3999,
+                    count: 1,
+                },
+                {
+                    name: '锤子2',
+                    price: 4999,
+                    count: 1,
+                },
+                {
+                    name: '华为P20',
+                    price: 3599,
+                    count: 1,
+                },
+                {
+                    name: 'OPPO R15',
+                    price: 2999,
+                    count: 1,
+                },
+                {
+                    name: 'OPPO R11',
+                    price: 1999,
+                    count: 1,
+                },
+            ],
+        },
+        methods: {
+            // 用户点击加减数量时调用
+            changeCount: function(prod, num) {
+                if(num < 0) {
+                    if(prod.count > 0) {
+                        prod.count += num;
+                    }
+                } else {
+                    prod.count += num;
+                }
+            },                 // 获取总金额
+            getTotalMoney: function() {
+                var totalMoney = 0.0;
+                for(var i = 0; i < this.products.length; ++i) {
+                    totalMoney += parseFloat(this.products[i].price * this.products[i].count);
+                };
+                return totalMoney;
+            }
+        }
+    });
+</script>
+@}

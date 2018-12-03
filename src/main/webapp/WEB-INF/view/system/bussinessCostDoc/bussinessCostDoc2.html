@@ -1,0 +1,369 @@
+<script type="module">
+    Vue.config.devtools = true;
+    // 0. 如果使用模块化机制编程，导入Vue和VueRouter，要调用 Vue.use(VueRouter)
+
+    // 1. 定义 (路由) 组件。
+    // 可以从其他文件 import 进来
+    const Foo = {
+        data: {
+            oldcount: -1
+        },
+        template:
+            `
+        <div class="user">
+        <h2>User {{ $route.params.id }}----{{oldcount}}----{{count}}</h2>
+        <router-view></router-view>
+        </div>
+        `,
+        computed: {
+            count: function () {
+                oldcount = store.state.count;
+                return store.state.count;
+            }
+        },
+        methods: {
+            clickMethod: function () {
+                store.commit('increment');
+                console.log(store.state.count)
+            }
+        }
+    };
+
+    const Bar = {
+        props: {
+            query: Object
+        },
+        template: `<div>{{ count }}--{{name}}--{{filterCount}}=={{query}}</div>`,
+        computed: {
+            count: function () {
+                return this.$store.state.count
+            },
+            name: function () {
+                alert("进入 name");
+                return this.increment(10);
+            },
+            ...Vuex.mapState({//如果辅助函数的第一个参数不设置，参数state是全局性质的，如果设置为对应的命名空间则state自动转化为对应的应用上下文的state
+                filterCount: function (state) {
+                    console.log(this.$store.getters);
+                    console.log(this.$store.state);
+                    return this.$store.getters.doneTodos.length;
+                }
+            })
+        },
+        methods: {
+            ...Vuex.mapMutations([
+                'increment', // 将 `this.increment()` 映射为 `this.$store.commit('increment')`
+            ]),
+        }
+    };
+    const Feng = {
+        template: '<span>Feng</span>'
+    };
+    const SingleInput = Vue.component('single-input');
+    const UserSettings = Vue.component('user-settings');
+
+    // 2. 定义路由
+    // 每个路由应该映射一个组件。 其中"component" 可以是
+    // 通过 Vue.extend() 创建的组件构造器，
+    // 或者，只是一个组件配置对象。
+    // 我们晚点再讨论嵌套路由。
+    const routes = [
+        {
+            path: '/foo/:id',
+            component: Foo,
+            children: [
+                {
+                    // 当 /user/:id/profile 匹配成功，
+                    // UserProfile 会被渲染在 User 的 <router-view> 中
+                    path: 'profile',
+                    name: 'foo1',
+                    component: SingleInput
+                },
+                {
+                    // 当 /user/:id/posts 匹配成功
+                    // UserPosts 会被渲染在 User 的 <router-view> 中
+                    path: 'posts',
+                    name: 'foo2',
+                    component: SingleInput
+                }
+            ]
+        },
+        {
+            path: '/bar/:id(\\d+)',
+            component: Bar,
+            props: function (route) {
+                return {query: route.query.q};
+            }
+        },
+        {
+            path: '/feng',
+            component: Feng,
+            beforeEnter: function (to, from, next) {
+                console.log(store.state);
+//                console.log(store.getters["a/randomA"]);
+                store.dispatch('someAction');
+                if (store.state.count == 0) {
+                    store.state.count = store.state.count + 1;
+                } else {
+                    alert(store.state.count);
+                }
+                next();
+            }
+        },
+        {
+            path: '/singleInput',
+            component: UserSettings,
+            children: [
+                {
+                    path: 'pro',
+                    component: SingleInput
+                },
+                {
+                    path: 'pr',
+                    components: {
+                        default: Feng,
+                        helper: SingleInput
+                    }
+                }
+            ]
+        },
+    ];
+
+    // 3. 创建 router 实例，然后传 `routes` 配置
+    // 你还可以传别的配置参数, 不过先这么简单着吧。
+    const router = new VueRouter({
+        routes,
+        parseQuery: function () {
+
+        },
+        scrollBehavior(to, from, savedPosition) {
+//           return new Promise(function (resolve,reject) {
+//               setTimeout(function () {
+//                   return resolve({x:0,y:0});
+//               },500)
+//           })
+        },
+        mode: "history"
+    });
+
+    router.beforeEach(function (to, from, next) {
+        next();
+    });
+
+    //创建vuex（vue的状态管理工具）
+    const moduleA = {
+        namespaced: true,
+        state: {
+            a: 0
+        },
+        mutations: {
+            incrementA(state, n) {
+                console.log("a局部----" + state);
+                state.a += n
+            }
+        },
+        getters: {
+            randomA: function (state, getters) {
+                console.log("a局部----" + state);
+                return Math.random();
+            }
+        },
+        actions: {
+            incrementA(context) {
+                context.commit('increment,100')
+            }
+        }
+    };
+
+    const moduleB = {
+        namespaced: true,
+        state: {
+            b: 0
+        },
+        mutations: {
+            incrementB(state, n) {
+                console.log("b局部----" + state);
+                state.b += n
+            }
+        },
+        getters: {
+            randomB: function () {
+                console.log("b局部----" + state);
+                return Math.random();
+            }
+        },
+        actions: {
+            incrementB(context) {
+                context.commit('increment,100')
+            },
+            someAction: {
+                root: true,
+                handler: function (namespacedContext, payload) {
+                    console.log(namespacedContext);
+                    console.log(payload);
+                } // -> 'someAction'
+            }
+        },
+        plugins: [
+            store => {
+                store.subscribe((mutation, state) => {
+                    console.log(mutation.type)
+                    console.log(mutation.payload)
+                })
+            }
+        ]
+    };
+
+    const store = new Vuex.Store({
+        state: {
+            count: 0,
+            todos: [
+                {id: 1, text: '...', done: true},
+                {id: 2, text: '...', done: false}
+            ]
+        },
+        mutations: {
+            increment(state, n) {
+                alert("this.increment");
+                state.count += n
+            }
+        },
+        getters: {
+            doneTodos: state => {
+                return state.todos.filter(todo => todo.done)
+            }
+        },
+        actions: {
+            increment(context) {
+                context.commit('increment,100')
+            }
+        },
+        modules: {
+            a: moduleA,
+            b: moduleB
+        },
+        plugins: [
+            store => {
+                store.subscribe((mutation, state) => {
+                    console.log(mutation.type)
+                    console.log(mutation.payload)
+                })
+            }
+        ],
+        strict: true//严格模式
+    });
+
+    // 4. 创建和挂载根实例。
+    // 记得要通过 router 配置参数注入路由，
+    // 从而让整个应用都有路由功能
+    const app = new Vue({
+        router: router
+    }).$mount('#app');
+
+    const app1 = new Vue({
+        el: '#app1',
+        // 把 store 对象提供给 “store” 选项，这可以把 store 的实例注入所有的子组件
+        store,
+        data: {
+            localCount: 1
+        },
+        components: {Bar},
+        template: `
+            <div class="app">
+            <span>{{newCount}}</span>
+            <span>{{countAlias}}</span>
+            <span>{{countPlusLocalState}}</span>
+            <bar></bar>
+            </div>
+        `,
+        computed: {
+            localComputed: function () {
+                return {localComputed: 11}
+            },
+            ...Vuex.mapState({
+                // 箭头函数可使代码更简练
+                newCount: state => state.count,
+
+                // 传字符串参数 'count' 等同于 `state => state.count`
+                countAlias: 'count',
+
+                // 为了能够使用 `this` 获取局部状态，必须使用常规函数
+                countPlusLocalState: function (state) {
+                    return state.count + this.localCount
+                }
+            })
+        }
+    });
+
+    // 现在，应用已经启动了！
+</script>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>管理</h5>
+            </div>
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <#NameCon id="condition" name="名称" />
+                            </div>
+                            <div class="col-sm-3">
+                                <#button name="搜索" icon="fa-search" clickFun="BussinessCostDoc.search()"/>
+                            </div>
+                        </div>
+                        <div class="hidden-xs" id="BussinessCostDocTableToolbar" role="group">
+                            @if(shiro.hasPermission("/bussinessCostDoc/add")){
+                            <#button name="添加" icon="fa-plus" clickFun="BussinessCostDoc.openAddBussinessCostDoc()"/>
+                            @}
+                            @if(shiro.hasPermission("/bussinessCostDoc/update")){
+                            <#button name="修改" icon="fa-edit" clickFun="BussinessCostDoc.openBussinessCostDocDetail()" space="true"/>
+                            @}
+                            @if(shiro.hasPermission("/bussinessCostDoc/delete")){
+                            <#button name="删除" icon="fa-remove" clickFun="BussinessCostDoc.delete()" space="true"/>
+                            @}
+                        </div>
+                        <#table id="BussinessCostDocTable"/>
+                        <!--使用vue-router开发单页面应用 start-->
+                        <div id="app">
+                            <h1>Hello App!</h1>
+                            <p>
+                                <!-- 使用 router-link 组件来导航. -->
+                                <!-- 通过传入 `to` 属性指定链接. -->
+                                <!-- <router-link> 默认会被渲染成一个 `<a>` 标签 -->
+                                <router-link v-bind:to="{name:'foo1',params:{id:1}}" v-bind:key="">Go to Foo1
+                                </router-link>
+                                <router-link v-bind:to="{name:'foo2',params:{id:2}}">Go to Foo2</router-link>
+                                <router-link to="/bar/451?q=vue">Go to Bar with params-with-regex</router-link>
+                                <router-link to="/feng?q=vue">Go to Feng</router-link>
+                                <router-link to="/singleInput/pro">Go to SingleInput pro</router-link>
+                                <router-link to="/singleInput/pr">Go to SingleInput pr</router-link>
+                            </p>
+                            <!-- 路由出口 -->
+                            <!-- 路由匹配到的组件将渲染在这里 -->
+                            <transition>
+                                <router-view/>
+                            </transition>
+
+                        </div>
+                        <!--使用vue-router开发单页面应用 end-->
+
+                        <!--使用vuex管理状态页面应用 start-->
+                        <div id="app1">
+                        </div>
+                        <!--使用vuex管理状态页面应用 end-->
+
+                        <!--使用vue-server-renderer开发服务端页面应用 start-->
+                        <!--使用vue-server-renderer开发服务端页面应用 end-->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@layout("/common/_container.html"){
+<script src="${ctxPath}/static/modular/system/bussinessCostDoc/bussinessCostDoc.js"></script>
+@}
